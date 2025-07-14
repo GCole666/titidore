@@ -1,0 +1,5 @@
+discord.py==2.5.2
+python-dotenv==1.1.1
+yt-dlp
+PyNaCl
+ffmpeg-python
