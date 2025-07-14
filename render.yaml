@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: discord-music-bot
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"
+      - key: DISCORD_TOKEN
+        sync: false  # This will be set manually in Render dashboard
