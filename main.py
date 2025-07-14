@@ -8,14 +8,49 @@ import yt_dlp
 import ffmpeg
 from collections import deque
 
-# Force load opus for voice support
-discord.opus.load_opus('libopus.so.0')
-if not discord.opus.is_loaded():
-    print("Opus not loaded, trying alternative...")
+# Load opus library with better error handling for Railway/hosting platforms
+def load_opus_library():
+    """Load opus library with multiple fallback options"""
+    import ctypes.util
+    
+    opus_paths = [
+        'opus',
+        'libopus.so.0',
+        'libopus.so',
+        'libopus.so.0.8.0',
+        'libopus.so.0.8',
+        '/usr/lib/x86_64-linux-gnu/libopus.so.0',
+        '/usr/lib/libopus.so.0',
+        '/usr/local/lib/libopus.so.0',
+        ctypes.util.find_library('opus')
+    ]
+    
+    for opus_path in opus_paths:
+        if opus_path is None:
+            continue
+        try:
+            discord.opus.load_opus(opus_path)
+            print(f"Successfully loaded opus from: {opus_path}")
+            return True
+        except Exception as e:
+            print(f"Failed to load opus from {opus_path}: {e}")
+            continue
+    
+    # Final attempt without specifying path
     try:
-        discord.opus.load_opus('opus')
-    except:
-        print("Warning: Opus library not found, voice may not work properly")
+        discord.opus.load_opus()
+        print("Successfully loaded opus (default)")
+        return True
+    except Exception as e:
+        print(f"Failed to load opus library: {e}")
+        return False
+
+# Load opus
+opus_loaded = load_opus_library()
+if not opus_loaded:
+    print("Warning: Opus library not loaded - voice functionality may not work")
+else:
+    print("Opus library loaded successfully")
 
 # Load environment variables
 load_dotenv()
